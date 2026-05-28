@@ -1,0 +1,55 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         String     @id @default(uuid())
+  userName   String     @unique
+  email      String     @unique
+  firstName  String
+  password   String
+  isPublic   Boolean    @default(true)
+  post       Posts[]
+  comments   Comments[]
+  friendList Friends[]
+}
+
+model Posts {
+  id       String     @id @default(uuid())
+  author   User       @relation(fields: [authorId], references: [id])
+  authorId String
+  postBody String
+  likes    Int
+  comments Comments[]
+}
+
+model Comments {
+  id          String @id @default(uuid())
+  post        Posts  @relation(fields: [postId], references: [id])
+  postId      String
+  commentText String
+  author      User   @relation(fields: [authorId], references: [id])
+  authorId    String
+  likes       Int
+}
+
+model Friends {
+  id         String  @id @default(uuid())
+  friend     User    @relation(fields: [friendId], references: [id])
+  friendId   String
+  invitation Boolean @default(true)
+  isFriend   Boolean @default(false)
+  isBlocked  Boolean @default(false)
+}
