@@ -19,9 +19,13 @@ authRouter.get('/me', verifyToken, async (req, res) => {
             userName: true,
             email: true,
             firstName: true,
-            isPublic: true
-
-        }
+            isPublic: true,
+            sentRequests: true,
+            receivedRequests: {include:
+                {receiver: {select: {userName: true}},
+                requester:  {select: {userName: true}}
+            },
+        }}
     })
     res.json({user})
 })

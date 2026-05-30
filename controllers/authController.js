@@ -55,7 +55,7 @@ async function login(req, res) {
             }, process.env.JWT_SECRET, 
             {expiresIn: '2hr'}
         )
-
+        console.log(user.isPublic)
         return res.json({user, token})
  }
 

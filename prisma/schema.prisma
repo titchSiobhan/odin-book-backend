@@ -23,7 +23,8 @@ model User {
   isPublic  Boolean  @default(true)
   post  Posts[]
   comments  Comments[]
-  friendList   Friends[]
+  sentRequests  Friends[]  @relation("Requester")
+  receivedRequests  Friends[]   @relation("Receiver")
 }
 
 model Posts {
@@ -31,7 +32,7 @@ model Posts {
   author  User @relation(fields: [authorId],  references: [id])
   authorId  String
   postBody  String
-  likes  Int
+  createdAt  DateTime  @default(now())
   comments  Comments[]
   
 }
@@ -43,12 +44,17 @@ model Comments {
   commentText  String
   author  User @relation(fields: [authorId],  references: [id])
   authorId  String
-  likes  Int
+   createdAt  DateTime  @default(now())
  }
 
  model  Friends{
   id  String  @id @default(uuid())
-  friend   User @relation(fields: [friendId],  references: [id])
-  friendId   String
- status  String
+requester  User @relation("Requester", fields: [requesterId], references:[id])
+ requesterId  String
+receiver  User @relation("Receiver", fields:[receiverId], references:[id])
+ receiverId  String
+ status  String  @default("pending")
+
+
+@@unique([requesterId, receiverId])
  }
