@@ -25,6 +25,8 @@ model User {
   comments  Comments[]
   sentRequests  Friends[]  @relation("Requester")
   receivedRequests  Friends[]   @relation("Receiver")
+  likePost  LikePost[]
+  likeComment   LikeComment[]
 }
 
 model Posts {
@@ -34,7 +36,7 @@ model Posts {
   postBody  String
   createdAt  DateTime  @default(now())
   comments  Comments[]
-  
+  likes  LikePost[]
 }
 
 model Comments {
@@ -45,6 +47,7 @@ model Comments {
   author  User @relation(fields: [authorId],  references: [id])
   authorId  String
    createdAt  DateTime  @default(now())
+   likes  LikeComment[]
  }
 
  model  Friends{
@@ -57,4 +60,24 @@ receiver  User @relation("Receiver", fields:[receiverId], references:[id])
 
 
 @@unique([requesterId, receiverId])
+ }
+
+
+ model LikePost{
+  id  String  @default(uuid())
+  post  Posts  @relation(fields: [postId], references: [id])
+  postId  String
+  user  User @relation(fields: [userId],  references: [id])
+  userId  String
+  @@unique([userId, postId])
+ }
+
+ model LikeComment{
+  id  String  @default(uuid())
+  comment  Comments  @relation(fields:[commentId], references:[id])
+  commentId  String
+  user  User @relation(fields: [userId],  references: [id])
+  userId  String
+  @@unique([userId, commentId])
+
  }

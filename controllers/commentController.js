@@ -29,6 +29,19 @@ async function getComments(req, res) {
     })
 }
 
+async function likeComment(req, res) {
+    const userId = req.user.id;
+    const commentId = req.params.commentId;
+
+    const like = await prisma.likeComment.create({
+        data: {
+            userId,
+            commentId
+        }
+    })
+    res.json({like})
+}
+
 export {
-    postComment, getComments
+    postComment, getComments, likeComment
 }

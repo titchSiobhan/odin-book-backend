@@ -17,4 +17,6 @@ userRouter.post('/user/unblock/:friendId', verifyToken, friendController.unblock
 
 userRouter.post('/user/delete/:friendId', verifyToken, friendController.deleteFriend)
 
+userRouter.post('/search/', friendController.search)
+
 export default userRouter

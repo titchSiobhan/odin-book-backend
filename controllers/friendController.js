@@ -13,6 +13,21 @@ async function sendFriendRequest(req, res) {
 	});
 	res.json(friend);
 }
+async function search(req,res) {
+const otherId = req.query.search;
+
+const user = await prisma.user.findMany({
+    where:{
+        userName: {
+            contains: otherId,
+            mode: 'insensitive'
+        }
+    }
+
+})
+res.json({user})
+}
+
 
 async function acceptFriend(req, res) {
 	const userId = req.user.id;
@@ -116,4 +131,4 @@ if (existing && (existing.requesterId === otherId && existing.receiverId === use
     res.json({message: 'user unfriended'})
  }
 
-export { sendFriendRequest, acceptFriend, block, unblock, deleteFriend };
+export { sendFriendRequest, acceptFriend, block, unblock, deleteFriend, search };
