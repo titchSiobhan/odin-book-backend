@@ -32,14 +32,13 @@ async function  signUp(req, res) {
 async function login(req, res) {
     const {email, password} = req.body;
     const user = await prisma.user.findUnique({
-        where: {
-            email
-        }
+       where: { email },
     }) 
 
     if (!user) {
         return res.json({message: 'Incorrect email'})
     }
+   
 
 
     const match = await bcrypt.compare(password, user.password)
@@ -55,10 +54,43 @@ async function login(req, res) {
             }, process.env.JWT_SECRET, 
             {expiresIn: '2hr'}
         )
-        console.log(user.isPublic)
-        return res.json({user, token})
+        const { password: _, ...safeUser } = user;
+        console.log(safeUser)
+        return res.json({safeUser, token})
+ }
+
+ async function me(req, res) {
+    const user = await prisma.user.findUnique({
+        where: {
+            id: req.user.id
+        },
+        select: {
+             id: true,
+            userName: true,
+            email: true,
+            firstName: true,
+            isPublic: true,
+            sentRequests: true,
+            receivedRequests: {include:
+                {receiver: {select: {userName: true}},
+                requester:  {select: {userName: true}}
+            },
+        }
+    }
+    })
+    const token = jwt.sign(
+        {
+            user: {
+                id: user.id,
+                userName: user.userName
+            }
+        }, process.env.JWT_SECRET,
+        {expiresIn: '2hr'}  
+    
+    );
+    res.json({safeUser: user, token})
  }
 
 export {
-    signUp, login
+    signUp, login, me
 }

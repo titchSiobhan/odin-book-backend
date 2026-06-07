@@ -7,19 +7,29 @@ async function postComment(req, res) {
     const userId = req.user.id
 
 
-    const comment = await prisma.comments.create({
-        data: {
-            postId: postId,
-            commentText, 
-            authorId: userId
-        }
-    })
-    res.json({comment})
+   const comment = await prisma.comments.create({
+  data: {
+    postId,
+    commentText,
+    authorId: userId
+  },
+  include: {
+    author: {
+      select: {
+        id: true,
+        userName: true
+      }
+    }
+  }
+});
+
+    res.json(comment)
 }
 
 
 async function getComments(req, res) {
     const { postId } = req.params.postId
+    
 
     const comments = await prisma.comments.findMany({
         where: {
@@ -27,6 +37,7 @@ async function getComments(req, res) {
         },
         orderBy: {createdAt: 'desc'}
     })
+    res.json(comment)
 }
 
 async function likeComment(req, res) {

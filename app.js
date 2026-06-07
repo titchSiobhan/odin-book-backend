@@ -12,12 +12,12 @@ import userRouter from './routes/userRouter.js'
 const app = express() 
 const PORT = process.env.PORT || 3000
 let corsOption = {
-    origin: ['']
+    origin: ['http://localhost:5173']
 }
 app.use(cors(corsOption))
 app.use(express.json())
 
-app.get('/', (req, res) => res.send(':)'))
+
 app.use('/', authRouter);
 app.use('/', postRouter);
 app.use('/', userRouter)

@@ -1,22 +1,34 @@
 import express from 'express'
 import jwt from 'jsonwebtoken';
-import verifyToken from '../middleware/verify.js';
+import * as verify from '../middleware/verify.js';
 
 import * as friendController from '../controllers/friendController.js'
+import * as userController from '../controllers/userController.js'
 
 const userRouter = express.Router();
 
 
-userRouter.post('/user/add-friend/:friendId/', verifyToken, friendController.sendFriendRequest);
+userRouter.post('/user/add-friend/:friendId/', verify.verifyToken, friendController.sendFriendRequest);
 
-userRouter.post('/user/accept/:friendId', verifyToken ,friendController.acceptFriend),
+userRouter.post('/user/accept/:friendId', verify.verifyToken ,friendController.acceptFriend),
 
-userRouter.post('/user/block/:friendId', verifyToken, friendController.block)
+userRouter.post('/user/block/:friendId', verify.verifyToken, friendController.block)
 
-userRouter.post('/user/unblock/:friendId', verifyToken, friendController.unblock)
+userRouter.post('/user/unblock/:friendId', verify.verifyToken, friendController.unblock)
 
-userRouter.post('/user/delete/:friendId', verifyToken, friendController.deleteFriend)
+userRouter.post('/user/delete/:friendId', verify.verifyToken, friendController.deleteFriend);
 
-userRouter.post('/search/', friendController.search)
+userRouter.get('/friends', verify.verifyToken, friendController.friendList)
+
+userRouter.get('/search',  friendController.search)
+
+userRouter.put('/user/private', verify.verifyToken, userController.setToPrivate)
+userRouter.put('/user/public', verify.verifyToken, userController.setToPublic);
+
+userRouter.get('/user/profile/:userId', verify.optionalVerifyToken, userController.GetUser)
+
+userRouter.get('/user/profile/friend/:userId', verify.verifyToken, friendController.getFriendShip)
+
+
 
 export default userRouter
