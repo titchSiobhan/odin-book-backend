@@ -1,96 +1,103 @@
-import bcrypt from "bcryptjs";
-import prisma from '../lib/prisma.js'
-import jwt from 'jsonwebtoken'
+import bcrypt from 'bcryptjs';
+import prisma from '../lib/prisma.js';
+import jwt from 'jsonwebtoken';
 
+async function signUp(req, res) {
+	const { userName, email, firstName, password, confirmPassword } = req.body;
+   
 
+	const userCheck = await prisma.user.findUnique({
+		where: {
+			email: email,
+		},
+	});
 
-async function  signUp(req, res) {
-    const {userName, email, firstName, password} = req.body;
+	if (userCheck) return res.json({ error: 'Email already in use' });
+    if (!confirmPassword || password != confirmPassword) return res.json({message: "Passwords don't match"})
 
-    const userCheck = await prisma.user.findUnique({
-        where: {
-            email: email
-        }
-    })
-    
+	const hashedPassword = await bcrypt.hash(password, 10);
 
-    if (userCheck) return res.json({error:'Email already in use'})
+	try {
+		
+			const user = await prisma.user.create({
+					data: {
+						userName,
+						email,
+						firstName,
+						password: hashedPassword,
+						
+					},
+				});
+				return res.json({ message: 'userCreated', user });
+		
 
-        const hashedPassword = await bcrypt.hash(password, 10);
-
-        const user = await prisma.user.create({
-            data: {
-                userName,
-                email,
-                firstName,
-                password: hashedPassword
-            }
-        })
-        return res.json({message: 'userCreated', user})
+		
+	} catch (err) {
+		res.status(500).json({ error: err.message });
+	}
 }
 
 async function login(req, res) {
-    const {email, password} = req.body;
-    const user = await prisma.user.findUnique({
-       where: { email },
-    }) 
+	const { email, password } = req.body;
+	const user = await prisma.user.findUnique({
+		where: { email },
+	});
 
-    if (!user) {
-        return res.json({message: 'Incorrect email'})
-    }
-   
+	if (!user) {
+		return res.json({ message: 'Incorrect email' });
+	}
 
+	const match = await bcrypt.compare(password, user.password);
 
-    const match = await bcrypt.compare(password, user.password)
+	if (!match) return res.json({ error: 'Incorrect password' });
 
-    if (!match) return res.json({error: 'Incorrect password'})
-
-        const token = jwt.sign(
-            {
-                user: {
-                    id: user.id,
-                    userName: user.userName
-                }, 
-            }, process.env.JWT_SECRET, 
-            {expiresIn: '2hr'}
-        )
-        const { password: _, ...safeUser } = user;
-        console.log(safeUser)
-        return res.json({safeUser, token})
- }
-
- async function me(req, res) {
-    const user = await prisma.user.findUnique({
-        where: {
-            id: req.user.id
-        },
-        select: {
-             id: true,
-            userName: true,
-            email: true,
-            firstName: true,
-            isPublic: true,
-            sentRequests: true,
-            receivedRequests: {include:
-                {receiver: {select: {userName: true}},
-                requester:  {select: {userName: true}}
-            },
-        }
-    }
-    })
-    const token = jwt.sign(
-        {
-            user: {
-                id: user.id,
-                userName: user.userName
-            }
-        }, process.env.JWT_SECRET,
-        {expiresIn: '2hr'}  
-    
-    );
-    res.json({safeUser: user, token})
- }
-
-export {
-    signUp, login, me
+	const token = jwt.sign(
+		{
+			user: {
+				id: user.id,
+				userName: user.userName,
+			},
+		},
+		process.env.JWT_SECRET,
+		{ expiresIn: '2hr' },
+	);
+	const { password: _, ...safeUser } = user;
+	console.log(safeUser);
+	return res.json({ safeUser, token });
 }
+
+async function me(req, res) {
+	const user = await prisma.user.findUnique({
+		where: {
+			id: req.user.id,
+		},
+		select: {
+			id: true,
+			userName: true,
+			email: true,
+			firstName: true,
+			isPublic: true,
+			profileImage: true,
+			sentRequests: true,
+			receivedRequests: {
+				include: {
+					receiver: { select: { userName: true } },
+					requester: { select: { userName: true } },
+				},
+			},
+		},
+	});
+	const token = jwt.sign(
+		{
+			user: {
+				id: user.id,
+				userName: user.userName,
+			},
+		},
+		process.env.JWT_SECRET,
+		{ expiresIn: '2hr' },
+	);
+	res.json({ safeUser: user, token });
+}
+
+export { signUp, login, me };

@@ -17,7 +17,8 @@ async function postComment(req, res) {
     author: {
       select: {
         id: true,
-        userName: true
+        userName: true,
+        profileImage: true
       }
     }
   }
@@ -53,6 +54,16 @@ async function likeComment(req, res) {
     res.json({like})
 }
 
+async function deleteComment(req, res) {
+    const commentId = req.params;
+    const commentDelete = await prisma.comments.delete({
+        where: {
+            id: commentId
+        }
+    })
+    res.json({message: 'comment deleted'})
+}
+
 export {
-    postComment, getComments, likeComment
+    postComment, getComments, likeComment, deleteComment
 }

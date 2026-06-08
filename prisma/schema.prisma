@@ -27,6 +27,7 @@ model User {
   receivedRequests  Friends[]   @relation("Receiver")
   likePost  LikePost[]
   likeComment   LikeComment[]
+  profileImage  String?
 }
 
 model Posts {
@@ -37,12 +38,13 @@ model Posts {
   createdAt  DateTime  @default(now())
   comments  Comments[]
   likes  LikePost[]
+  image  String?
 }
 
 model Comments {
   id  String  @id @default(uuid())
-  post  Posts  @relation(fields: [postId], references: [id])
-  postId  String
+  post  Posts?  @relation(fields: [postId], references: [id])
+  postId  String?
   commentText  String
   author  User @relation(fields: [authorId],  references: [id])
   authorId  String

@@ -1,12 +1,12 @@
 import express from 'express'
 import jwt from 'jsonwebtoken';
+import upload from '../middleware/multer.js';
 import * as verify from '../middleware/verify.js';
 
 import * as friendController from '../controllers/friendController.js'
 import * as userController from '../controllers/userController.js'
 
 const userRouter = express.Router();
-
 
 userRouter.post('/user/add-friend/:friendId/', verify.verifyToken, friendController.sendFriendRequest);
 
@@ -29,6 +29,7 @@ userRouter.get('/user/profile/:userId', verify.optionalVerifyToken, userControll
 
 userRouter.get('/user/profile/friend/:userId', verify.verifyToken, friendController.getFriendShip)
 
+userRouter.post('/user/profile/update', verify.verifyToken, upload.single('image'),  userController.uploadProfilePicture)
 
 
 export default userRouter
