@@ -1,5 +1,4 @@
-import { configDotenv } from 'dotenv'
-configDotenv()
+
 
 //barelySocial
 //it's social, but barely social
