@@ -27,9 +27,40 @@ async function createPost(req, res) {
 				return res.json(post);
 		}
 
-		//if photo
+		//if no text
+		if (!postBody) {
+			const stream = cloudinary.uploader.upload_stream(
+			{
+				folder: 'post_image',
+			},
+			async (error, result) => {
+				if (error) return res.status(500).json({ error });
 
-		const stream = cloudinary.uploader.upload_stream(
+				const post = await prisma.posts.create({
+					data: {
+						author: { connect: { id: req.user.id } },
+						
+						image: result.secure_url,
+					},
+					include: {
+						author: {
+							select: {
+								id: true,
+								userName: true,
+								isPublic: true,
+							},
+						},
+						likes: true,
+					},
+				});
+				 return res.json(post);
+			},
+		);
+	}
+
+		//if photo and text
+
+		 stream = cloudinary.uploader.upload_stream(
 			{
 				folder: 'post_image',
 			},
@@ -125,6 +156,8 @@ async function getPostsGlobal(req, res) {
 		},
 	});
 	res.json({ post });
+	
+
 }
 
 async function friendsOnlyPosts(req, res) {
@@ -228,7 +261,7 @@ async function userPosts(req, res) {
 		},
 		orderBy: { createdAt: 'desc' },
 	});
-	console.log('author id', authorId);
+	
 
 	res.json({ post: post });
 }
@@ -251,6 +284,11 @@ async function deletePost(req, res) {
 	const {postId} = req.params;
 	const userId = req.user.id
 const deleteComments = await prisma.comments.deleteMany({
+	where: {
+		postId: postId
+	}
+});
+const deleteLikes = await prisma.likePost.deleteMany({
 	where: {
 		postId: postId
 	}

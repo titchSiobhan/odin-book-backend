@@ -23,6 +23,10 @@ app.use(cors(corsOption))
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 app.use(express.json())
+app.use((req, res, next) => {
+  res.set('Cache-Control', 'no-store');
+  next();
+});
 app.use('/', authRouter);
 app.use('/', postRouter);
 app.use('/', userRouter)

@@ -56,6 +56,11 @@ async function likeComment(req, res) {
 
 async function deleteComment(req, res) {
     const commentId = req.params;
+    const deleteLikes = await prisma.likeComment.deleteMany({
+	where: {
+		commentId: commentId
+	}
+});
     const commentDelete = await prisma.comments.delete({
         where: {
             id: commentId

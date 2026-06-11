@@ -45,6 +45,7 @@ async function GetUser(req, res) {
 			id: true,
 			receivedRequests: true,
 			sentRequests: true,
+            profileImage:true
 		},
 	});
 	res.json({ user: getUser });
@@ -67,14 +68,14 @@ async function uploadProfilePicture(req, res) {
           return res.status(500).json({ error: "Cloudinary upload failed" });
         }
 
-        console.log("Cloudinary result:", result.secure_url);
+    
 
         const updatedUser = await prisma.user.update({
           where: { id: req.user.id },
           data: { profileImage: result.secure_url }, // ← EXACT FIELD NAME
         });
 
-        console.log("DB updated:", updatedUser);
+        
 
         res.json(updatedUser);
       }

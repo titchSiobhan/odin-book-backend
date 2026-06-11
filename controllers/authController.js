@@ -4,7 +4,6 @@ import jwt from 'jsonwebtoken';
 
 async function signUp(req, res) {
 	const { userName, email, firstName, password, confirmPassword } = req.body;
-   
 
 	const userCheck = await prisma.user.findUnique({
 		where: {
@@ -13,25 +12,21 @@ async function signUp(req, res) {
 	});
 
 	if (userCheck) return res.json({ error: 'Email already in use' });
-    if (!confirmPassword || password != confirmPassword) return res.json({message: "Passwords don't match"})
+	if (!confirmPassword || password != confirmPassword)
+		return res.json({ message: "Passwords don't match" });
 
 	const hashedPassword = await bcrypt.hash(password, 10);
 
 	try {
-		
-			const user = await prisma.user.create({
-					data: {
-						userName,
-						email,
-						firstName,
-						password: hashedPassword,
-						
-					},
-				});
-				return res.json({ message: 'userCreated', user });
-		
-
-		
+		const user = await prisma.user.create({
+			data: {
+				userName,
+				email,
+				firstName,
+				password: hashedPassword,
+			},
+		});
+		return res.json({ message: 'userCreated', user });
 	} catch (err) {
 		res.status(500).json({ error: err.message });
 	}
@@ -39,12 +34,17 @@ async function signUp(req, res) {
 
 async function login(req, res) {
 	const { email, password } = req.body;
-	const user = await prisma.user.findUnique({
-		where: { email },
+	const user = await prisma.user.findFirst({
+		where: {
+			email: {
+						contains: email,
+						mode: 'insensitive',
+					},
+		},
 	});
 
 	if (!user) {
-		return res.json({ message: 'Incorrect email' });
+		return res.json({ error: 'Incorrect email' });
 	}
 
 	const match = await bcrypt.compare(password, user.password);
@@ -62,7 +62,7 @@ async function login(req, res) {
 		{ expiresIn: '2hr' },
 	);
 	const { password: _, ...safeUser } = user;
-	console.log(safeUser);
+	
 	return res.json({ safeUser, token });
 }
 

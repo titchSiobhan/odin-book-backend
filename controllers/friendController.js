@@ -27,6 +27,7 @@ async function friendList(req, res) {
 			requester: true,
 			receiver: true,
 			status: true,
+			
 		},
 	});
 	res.json(friends);
