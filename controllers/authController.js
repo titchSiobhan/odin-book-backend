@@ -26,6 +26,7 @@ async function signUp(req, res) {
 				password: hashedPassword,
 			},
 		});
+		console.log(user,'user Created')
 		return res.json({ message: 'userCreated', user });
 	} catch (err) {
 		res.status(500).json({ error: err.message });
