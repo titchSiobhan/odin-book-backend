@@ -27,40 +27,11 @@ async function createPost(req, res) {
 				return res.json(post);
 		}
 
-		//if no text
-		if (!postBody) {
-			const stream = cloudinary.uploader.upload_stream(
-			{
-				folder: 'post_image',
-			},
-			async (error, result) => {
-				if (error) return res.status(500).json({ error });
 
-				const post = await prisma.posts.create({
-					data: {
-						author: { connect: { id: req.user.id } },
-						
-						image: result.secure_url,
-					},
-					include: {
-						author: {
-							select: {
-								id: true,
-								userName: true,
-								isPublic: true,
-							},
-						},
-						likes: true,
-					},
-				});
-				 return res.json(post);
-			},
-		);
-	}
 
 		//if photo and text
 
-		 stream = cloudinary.uploader.upload_stream(
+		 const stream = cloudinary.uploader.upload_stream(
 			{
 				folder: 'post_image',
 			},
@@ -70,7 +41,7 @@ async function createPost(req, res) {
 				const post = await prisma.posts.create({
 					data: {
 						author: { connect: { id: req.user.id } },
-						postBody,
+						postBody: postBody || null,
 						image: result.secure_url,
 					},
 					include: {
