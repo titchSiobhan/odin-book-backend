@@ -16,8 +16,10 @@ const app = express()
 const PORT = process.env.PORT || 3000
 let corsOption = {
     origin: ['http://localhost:5173',
-        'https://barely-social.netlify.app/'
+        'https://barely-social.netlify.app'
     ],
+    methods: 'GET, POST, DELETE, PUT',
+     allowedHeaders: ['Content-Type', 'Authorization'] ,
      credentials: true
 }
 app.use(cors(corsOption))
