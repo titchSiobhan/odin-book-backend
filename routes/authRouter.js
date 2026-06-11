@@ -7,7 +7,7 @@ import prisma from '../lib/prisma.js'
 
 const authRouter = express.Router()
 
-authRouter.post('/sign-up', upload.single('image'), authController.signUp)
+authRouter.post('/sign-up',  authController.signUp)
 
 authRouter.post('/login', authController.login)
 
