@@ -23,6 +23,9 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+     "migrate": "prisma migrate deploy",
+
+    "postinstall": "prisma generate",
     "dev": "nodemon app.js"
   },
   "prisma": {
