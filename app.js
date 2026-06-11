@@ -16,7 +16,10 @@ import { fileURLToPath } from 'url'
 const app = express() 
 const PORT = process.env.PORT || 3000
 let corsOption = {
-    origin: ['http://localhost:5173']
+    origin: ['http://localhost:5173',
+        'https://barely-social.netlify.app'
+    ],
+     credentials: true
 }
 app.use(cors(corsOption))
 

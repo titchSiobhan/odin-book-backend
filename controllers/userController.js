@@ -72,7 +72,7 @@ async function uploadProfilePicture(req, res) {
 
         const updatedUser = await prisma.user.update({
           where: { id: req.user.id },
-          data: { profileImage: result.secure_url }, // ← EXACT FIELD NAME
+          data: { profileImage: result.secure_url }, 
         });
 
         
